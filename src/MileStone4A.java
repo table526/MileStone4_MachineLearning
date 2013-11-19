@@ -30,12 +30,12 @@ public class MileStone4A {
     	caseName[10] = "hepatitis";
     	caseName[11] = "hypothyroid2";
     	
-    	ArrayList<String> Options = new ArrayList<String>();
+    	String [] Options = new String[12];
     	
     	LMT lmt_cf = new LMT();
     	double [] error_0 = new double[12];
     	double [] error_1 = new double[12];
-    	for(int i = 0; i < caseName.length; i++)
+    	for(int i = 0; i < 1/*caseName.length*/; i++)
     	{
     		DataSource train_source = new DataSource(caseName[i] + "_train.arff");
     		Instances train = train_source.getDataSet();
@@ -56,6 +56,8 @@ public class MileStone4A {
    	 
     		double nb_error = nb_model(nb_cf, train, test);
     		error_0[i] = LMT_model(lmt_cf, train, test, caseName[i]) / nb_error;
+    		Options[i] = LMT_Option(train);
+    		System.out.println(Options[i]);
     		error_1[i] = LMT_model_revised(lmt_cf, train, test, Options[i], caseName[i]) / nb_error;
     	}  	
     		
@@ -82,26 +84,66 @@ public class MileStone4A {
        	
        	Evaluation eval = new Evaluation(train);
        	eval.evaluateModel(tree, test);
-		ObjectOutputStream oos = new ObjectOutputStream(
+       	/*ObjectOutputStream oos = new ObjectOutputStream(
 				new FileOutputStream("./models/" + caseName + "0.model"));
-		oos.writeObject(tree);
-		oos.flush();
-		oos.close();
+       	oos.writeObject(tree);
+       	oos.flush();
+       	oos.close();*/
       	return eval.errorRate();
     } 
+    
+    public static String LMT_Option(Instances train) throws Exception
+    {
+        double W_val = 0.0; 
+        int I_val = 0;
+        CVParameterSelection ps = new CVParameterSelection();
+        ps.setClassifier(new LMT());
+        ps.setNumFolds(5);  // using 5-fold CV
+        ps.addCVParameter("W 0.0 0.5 6");
+        //ps.addCVParameter("I -1 14 4");
+
+        // Get the value of W
+        ps.buildClassifier(train);
+        //System.out.println(Utils.joinOptions(ps.getBestClassifierOptions()));
+        String [] opt_token = ps.getBestClassifierOptions();
+        for(int i = 0; i < opt_token.length; i++)
+        {
+          if(opt_token[i].contains("W"))
+          {
+            W_val = Double.parseDouble(opt_token[i + 1]);
+            break;
+          }
+        }
+        
+        ps = new CVParameterSelection();
+        ps.setClassifier(new LMT());
+        ps.setNumFolds(5);  // using 5-fold CV
+        ps.addCVParameter("I -1 14 4");
+        ps.buildClassifier(train);
+        for(int i = 0; i < opt_token.length; i++)
+        {
+          if(opt_token[i].contains("I"))
+          {
+            I_val = Integer.parseInt(opt_token[i + 1]);
+            break;
+          }
+        }
+        
+        return "-W " + Double.toString(W_val) + " -I " + Integer.toString(I_val);
+    }
     
     public static double LMT_model_revised(LMT tree, Instances train, Instances test, String Options, String caseName) throws Exception
     {
       	tree.setOptions(Options.split(" "));
-    	tree.buildClassifier(train);   // build classifier
+    	  tree.buildClassifier(train);   // build classifier
        	
        	Evaluation eval = new Evaluation(train);
        	eval.evaluateModel(tree, test);
-       	ObjectOutputStream oos = new ObjectOutputStream(
+       	/*ObjectOutputStream oos = new ObjectOutputStream(
 				new FileOutputStream("./models/" + caseName + "1.model"));
-		oos.writeObject(tree);
-		oos.flush();
-		oos.close();
+       	oos.writeObject(tree);
+       	oos.flush();
+       	oos.close();*/
       	return eval.errorRate();
     } 
 
