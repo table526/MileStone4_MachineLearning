@@ -13,11 +13,11 @@ import weka.core.Instances;
 import weka.core.Utils;
 import weka.core.converters.ConverterUtils.DataSource;
 
-public class MileStone4A {
+public class MileStone4B {
  
     public static void main(String[] args) throws Exception{
         
-    	String [] caseName = new String[12];
+    	String [] caseName = new String[24];
     	caseName[0] = "anneal";
     	caseName[1] = "audiology";
     	caseName[2] = "autos";
@@ -30,13 +30,25 @@ public class MileStone4A {
     	caseName[9] = "heart-c";
     	caseName[10] = "hepatitis";
     	caseName[11] = "hypothyroid2";
+    	caseName[12] = "ionosphere";
+    	caseName[13] = "labor";
+    	caseName[14] = "lymph";
+    	caseName[15] = "mushroom";
+    	caseName[16] = "segment";
+    	caseName[17] = "sonar";
+    	caseName[18] = "soybean";
+    	caseName[19] = "splice";
+    	caseName[20] = "vehicle";
+    	caseName[21] = "vote";
+    	caseName[22] = "vowel";
+    	caseName[23] = "zoo";
     	
-    	String [] Options = new String[12];
+    	String [] Options = new String[24];
     	
     	LMT lmt_cf = new LMT();
-    	double [] error_0 = new double[12];
-    	double [] error_1 = new double[12];
-    	for(int i = 0; i < caseName.length; i++)
+    	double [] error_0 = new double[24];
+    	double [] error_1 = new double[24];
+    	for(int i = 19; i < 20/*caseName.length*/; i++)
     	{
     		DataSource train_source = new DataSource(caseName[i] + "_train.arff");
     		Instances train = train_source.getDataSet();
